@@ -36,20 +36,23 @@ public class Dependencies {
 		}
 
 		char[] order = buildOrder(projs, X, Y);
-		
+
 		print("Order: ");
-		for (int i = 0; i < order.length - 1; i++) {
-			print(order[i] + ", ");
-			if ((i + 1) % 25 == 0) {
-				print("\n");
+		if (order.length == 0) {
+			print("error");
+		} else {
+			for (int i = 0; i < order.length - 1; i++) {
+				print(order[i] + ", ");
+				if ((i + 1) % 25 == 0) {
+					print("\n");
+				}
 			}
+			print(order[order.length - 1] + "");
 		}
-		print(order[order.length - 1] + "");
 		sc.close();
 	}
 
 	public static char[] buildOrder(char[] projs, char[] X, char[] Y) {
-		char[] order = new char[projs.length];
 		int depCount = X.length;
 		char[] stack = new char[projs.length];
 		int stackCount = 0;
@@ -64,11 +67,13 @@ public class Dependencies {
 				break;
 			}
 			int[] counts = getOrder(projs[i], Y, X, stack, depCount, stackCount);
+			if (counts.length == 0) {
+				return new char[0];
+			}
 			depCount = counts[0];
 			stackCount = counts[1];
 		}
-		order = stack;
-		return order;
+		return stack;
 	}
 
 	public static int[] getOrder(char c, char[] Y, char[] X, char[] stack, int depCount, int stackCount) {
@@ -91,6 +96,9 @@ public class Dependencies {
 			int[] counts = getOrder(chars[i], Y, X, stack, depCount, stackCount);
 			depCount = counts[0];
 			stackCount = counts[1];
+		}
+		if (stackCount == stack.length) {
+			return new int[0];
 		}
 		stack[stackCount] = c;
 		stackCount++;
