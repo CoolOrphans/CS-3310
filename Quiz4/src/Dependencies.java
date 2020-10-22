@@ -27,27 +27,17 @@ public class Dependencies {
 		if (Deps.length() == 1) {
 			Deps = "(a, d), (f, b), (b, d), (f, a), (d, c)";
 		}
-		char[] deps = new char[(Deps.length() + 2) / 7 * 2];
-		int k = 0;
-		for (int i = 0; i < deps.length / 2; i++) {
-			deps[k] = Deps.charAt(i * 8 + 1);
-			deps[k + 1] = Deps.charAt(i * 8 + 4);
-			k += 2;
-		}
 
-		// NOTE COULD HAVE TWO SEPARATE ARRAYS OF X's AND Y's.
 		char[] X = new char[(Deps.length() + 2) / 7];
 		char[] Y = new char[X.length];
 		for (int i = 0; i < X.length; i++) {
 			X[i] = Deps.charAt(i * 8 + 1);
 			Y[i] = Deps.charAt(i * 8 + 4);
 		}
-		print("X: ");
-		printChars(X);
-		print("Y: ");
-		printChars(Y);
 
 		char[] order = buildOrder(projs, X, Y);
+		
+		print("Order: ");
 		for (int i = 0; i < order.length - 1; i++) {
 			print(order[i] + ", ");
 			if ((i + 1) % 25 == 0) {
@@ -63,11 +53,20 @@ public class Dependencies {
 		int depCount = X.length;
 		char[] stack = new char[projs.length];
 		int stackCount = 0;
-		do {
-		int[] counts = getOrder(X[0], Y, X, stack, depCount, stackCount);
-		depCount = counts[0];
-		stackCount = counts[1];
-		} while (depCount >= 0 && stackCount < stack.length);
+		for (int i = 0; i < projs.length; i++) {
+			while (inStack(projs[i], stack, stackCount)) {
+				i++;
+				if (i == projs.length) {
+					break;
+				}
+			}
+			if (i == projs.length) {
+				break;
+			}
+			int[] counts = getOrder(projs[i], Y, X, stack, depCount, stackCount);
+			depCount = counts[0];
+			stackCount = counts[1];
+		}
 		order = stack;
 		return order;
 	}
