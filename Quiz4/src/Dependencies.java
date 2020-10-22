@@ -62,10 +62,12 @@ public class Dependencies {
 		char[] order = new char[projs.length];
 		int depCount = X.length;
 		char[] stack = new char[projs.length];
-		int stackCount = X.length - 1;
-		int[] counts = getOrder(X[1], Y, X, stack, depCount, stackCount);
+		int stackCount = 0;
+		do {
+		int[] counts = getOrder(X[0], Y, X, stack, depCount, stackCount);
 		depCount = counts[0];
 		stackCount = counts[1];
+		} while (depCount >= 0 && stackCount < stack.length);
 		order = stack;
 		return order;
 	}
@@ -92,12 +94,12 @@ public class Dependencies {
 			stackCount = counts[1];
 		}
 		stack[stackCount] = c;
-		stackCount--;
+		stackCount++;
 		return new int[] { depCount, stackCount };
 	}
 
 	public static boolean inStack(char c, char[] stack, int stackCount) {
-		for (int i = stackCount; i < stack.length; i++) {
+		for (int i = 0; i < stackCount; i++) {
 			if (stack[i] == c) {
 				return true;
 			}
