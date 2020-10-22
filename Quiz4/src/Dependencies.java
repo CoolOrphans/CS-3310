@@ -36,20 +36,83 @@ public class Dependencies {
 		}
 
 		// NOTE COULD HAVE TWO SEPARATE ARRAYS OF X's AND Y's.
-		char[] x = new char[(Deps.length() + 2) / 7];
-		char[] y = new char[x.length];
-		for (int i = 0; i < x.length; i++) {
-			x[i] = Deps.charAt(i * 8 + 1);
-			y[i] = Deps.charAt(i * 8 + 4);
+		char[] X = new char[(Deps.length() + 2) / 7];
+		char[] Y = new char[X.length];
+		for (int i = 0; i < X.length; i++) {
+			X[i] = Deps.charAt(i * 8 + 1);
+			Y[i] = Deps.charAt(i * 8 + 4);
 		}
-		printChars(x);
-		printChars(y);
+		print("X: ");
+		printChars(X);
+		print("Y: ");
+		printChars(Y);
 
+		char[] order = buildOrder(projs, X, Y);
+		for (int i = 0; i < order.length - 1; i++) {
+			print(order[i] + ", ");
+			if ((i + 1) % 25 == 0) {
+				print("\n");
+			}
+		}
+		print(order[order.length - 1] + "");
 		sc.close();
 	}
 
-	// to remove dependencies can swap characters at index and decrease a counter
-	public static void buildOrder(char[] projs, char[] x, char[] y) {
+	public static char[] buildOrder(char[] projs, char[] X, char[] Y) {
+		char[] order = new char[projs.length];
+		int depCount = X.length;
+		char[] stack = new char[projs.length];
+		int stackCount = X.length - 1;
+		int[] counts = getOrder(X[4], Y, X, stack, depCount, stackCount);
+		depCount = counts[0];
+		stackCount = counts[1];
+		order = stack;
+		return order;
+	}
+
+	public static int[] getOrder(char c, char[] Y, char[] X, char[] stack, int depCount, int stackCount) {
+		char[] chars = new char[depCount];
+		int count = 0;
+		// get dependency indices of character c
+		for (int i = 0; i < depCount; i++) {
+			// need AND condition to see if X[i] has already been used in the stack
+			if (c == Y[i] && !inStack(X[i], stack, stackCount)) {
+				chars[count] = X[i];
+				count++;
+				replace(Y, Y[depCount - 1], i);
+				replace(X, X[depCount - 1], i);
+				depCount--;
+				i--;
+			}
+		}
+		// get dependencies of the dependencies of character c
+		for (int i = 0; i < count; i++) {
+			int[] counts = getOrder(chars[i], Y, X, stack, depCount, stackCount);
+			depCount = counts[0];
+			stackCount = counts[1];
+		}
+		stack[stackCount] = c;
+		stackCount--;
+		return new int[] { depCount, stackCount };
+	}
+
+	public static boolean inStack(char c, char[] stack, int stackCount) {
+		for (int i = stackCount; i < stack.length; i++) {
+			if (stack[i] == c) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void swap(char[] chars, int a, int b) {
+		char temp = chars[a];
+		chars[a] = chars[b];
+		chars[b] = temp;
+	}
+
+	public static void replace(char[] chars, char c, int i) {
+		chars[i] = c;
 	}
 
 	// Test function
