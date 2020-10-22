@@ -63,7 +63,7 @@ public class Dependencies {
 		int depCount = X.length;
 		char[] stack = new char[projs.length];
 		int stackCount = X.length - 1;
-		int[] counts = getOrder(X[4], Y, X, stack, depCount, stackCount);
+		int[] counts = getOrder(X[1], Y, X, stack, depCount, stackCount);
 		depCount = counts[0];
 		stackCount = counts[1];
 		order = stack;
